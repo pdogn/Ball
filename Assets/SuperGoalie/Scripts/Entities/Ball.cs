@@ -17,6 +17,9 @@ namespace Assets.SuperGoalie.Scripts.Entities
 
         public SphereCollider SphereCollider { get; set; }
 
+        private float timeFly;
+        public float TimeFly => timeFly;
+
         private void Awake()
         {
             //get the components
@@ -67,6 +70,7 @@ namespace Assets.SuperGoalie.Scripts.Entities
 
             //find the time to target
             float time = toTargetXZ.magnitude / power;
+            timeFly = time;
 
             // calculate starting speeds for xz and y. Physics forumulase deltaX = v0 * t + 1/2 * a * t * t
             // where a is "-gravity" but only on the y plane, and a is 0 in xz plane.

@@ -11,6 +11,7 @@ public class KickScript : MonoBehaviour
     //[SerializeField] private BallScript ballScript;
     //[SerializeField] private BallPhysic parabolaPhysics;
 
+    public BallPhysic _ballPhysic;
     public Ball _ball;
     public delegate void BallLaunch(float power, Vector3 target);   //delegate to launch a ball
     public BallLaunch OnBallLaunch;                                 //on ball launch
@@ -79,8 +80,9 @@ public class KickScript : MonoBehaviour
             BallLaunch tempBallLaunch = OnBallLaunch;
             if (tempBallLaunch != null)
             {
-                endPoint = GetRandomGoalPoint(firtFootPos - lastFootPos < 0);
+                endPoint = GetRandomGoalPoint(firtFootPos - lastFootPos > 0);
                 tempBallLaunch.Invoke(40, endPoint);
+                _ballPhysic.CurveTheBall(_ball.TimeFly);
             }
 
             GameManager.Instance.RiSet();

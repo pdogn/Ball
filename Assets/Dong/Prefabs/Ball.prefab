@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2845618748810975677}
   - component: {fileID: 3177557410518040707}
   - component: {fileID: 433005988753374115}
+  - component: {fileID: 6877738217762778107}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Untagged
@@ -96,14 +97,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startPoint: {fileID: 0}
-  endPoint: {x: 0, y: 0, z: 0}
-  height: 3
-  width: 3
-  duration: 0.58
+  _ball: {fileID: 6877738217762778107}
   canKick: 1
   goalTopLeft: {fileID: 0}
   goalBottomCenter: {fileID: 0}
   goalTopRight: {fileID: 0}
+--- !u!114 &6877738217762778107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5738004431594314802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fba9a098278cf4246a51546a335c0e90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gravity: 9
 --- !u!1001 &3565015682706498861
 PrefabInstance:
   m_ObjectHideFlags: 0

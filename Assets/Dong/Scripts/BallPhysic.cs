@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using Assets.SuperGoalie.Scripts.Entities;
+using DG.Tweening;
 
 [RequireComponent(typeof(Rigidbody))]
 public class BallPhysic : MonoBehaviour
@@ -6,18 +8,20 @@ public class BallPhysic : MonoBehaviour
     private ScriptHandler handler;
 
     public Transform startPoint;   // điểm bắt đầu
-    public Vector3 endPoint;     // điểm kết thúc
+    //public Vector3 endPoint;     // điểm kết thúc
     public float height = 3f;      // độ cao cực đại của quỹ đạo
     public float width = 3f;      // độ ngang cực đại của quỹ đạo
-    public float duration = 2f;    // thời gian bay (tốc độ)
+    //public float duration = 2f;    // thời gian bay (tốc độ)
 
-    private float time = 0f;
-    private Vector3 lastPos;
-    Vector3 moveDir;
+    Transform model;
+    public Ball _ball;
+    //private float time = 0f;
+    //private Vector3 lastPos;
+    //Vector3 moveDir;
 
-    bool endPath;
-    bool step2;
-    Rigidbody rb;
+    //bool endPath;
+    //bool step2;
+    //Rigidbody rb;
 
     public bool canKick;
 
@@ -25,101 +29,44 @@ public class BallPhysic : MonoBehaviour
     public Transform goalBottomCenter;
     public Transform goalTopRight;
 
+    private Sequence seq;
+    Vector3 targetLocalPos;
+    Vector3 midLocalPos;
+    Vector3 localOffset = new Vector3(0, 2, 0);
+
     void Start()
     {
         // Gán vị trí bắt đầu ban đầu
         transform.position = startPoint.position;
-        lastPos = transform.position;
-        rb = GetComponent<Rigidbody>();
+        //lastPos = transform.position;
+        //rb = GetComponent<Rigidbody>();
+
+        model = this.transform.GetChild(0);
+        targetLocalPos = model.localPosition;
 
         handler = FindObjectOfType<ScriptHandler>();
         handler?.Nextkickk();
     }
 
-    void Update()
+
+    public void CurveTheBall(float duration)
     {
-        //if (canKick) return;
-        //if (time < duration)
-        //{
-        //    time += Time.deltaTime;
-        //    float t = Mathf.Clamp01(time / duration);
-
-        //    // Di chuyển tuyến tính từ start -> end (trên XZ)
-        //    Vector3 pos = Vector3.Lerp(startPoint.position, endPoint - new Vector3(0, 0, 1.3f), t);
-
-        //    // Thêm độ cong trên trục Y
-        //    pos.y += height * (1 - 4 * (t - 0.5f) * (t - 0.5f));
-        //    pos.x += -width * (1 - 4 * (t - 0.5f) * (t - 0.5f));
-
-        //    // Cập nhật vị trí
-        //    transform.position = pos;
-
-        //    // --- Xoay theo hướng bay ---
-        //    moveDir = pos - lastPos;
-        //    if (moveDir.sqrMagnitude > 0.0001f) // tránh chia 0
-        //    {
-        //        transform.forward = moveDir.normalized;
-        //    }
-
-        //    lastPos = pos;
-        //}
-        //else
-        //{
-        //    endPath = true;
-        //}
-
-        //if (endPath && step2 == false)
-        //{
-        //    endPath = false;
-        //    step2 = true;
-        //    rb.AddForce(Vector3.forward * 35f, ForceMode.Impulse);
-        //}
-
-        //if (Input.GetKeyDown(KeyCode.R))
-        //{
-        //    ReKick(true);
-        //}
-        ////if (Input.GetKeyDown(KeyCode.Space))
-        ////{
-        ////    handler?.Nextkickk();
-        ////    canKick = true;
-        ////}
-    }
-
-    public void ReKick(bool leftKick)
-    {
+        //float duration = _ball.TimeFly;
         height = Random.Range(1, 5);
-        width = Random.Range(1, 5);
-        if (leftKick)
-        {
-            width = -width;
-        }
+        width = Random.Range(-5, 5);
 
-        if (!canKick) return;
-        endPoint = GetRandomGoalPoint(leftKick);
-        canKick = false;
-        time = 0;
-        step2 = false;
+        localOffset.x = width;
+        localOffset.y = height;
+        midLocalPos = targetLocalPos + localOffset;
 
-        //handler.STCR();
-    }
+        seq?.Kill();
+        seq = DOTween.Sequence();
 
-    Vector3 GetRandomGoalPoint(bool leftGoal)
-    {
-        float randomX=0;
-        float randomY=3;
-        if (leftGoal)
-        {
-            randomX = Random.Range(goalTopLeft.position.x, goalBottomCenter.position.x);
-            randomY = Random.Range(goalBottomCenter.position.y, goalTopLeft.position.y);
-        }
-        else
-        {
-            randomX = Random.Range(goalBottomCenter.position.x, goalTopRight.position.x);
-            randomY = Random.Range(goalBottomCenter.position.y, goalTopRight.position.y);
-        }
-        //Debug.Log("random pos " + randomX + " :: " + randomY);
-        return new Vector3(randomX, randomY, goalTopLeft.position.z);
+        seq.Append(model.DOLocalMove(midLocalPos, duration / 2f).SetEase(Ease.OutQuad));
+
+        seq.Append(model.DOLocalMove(targetLocalPos, duration / 2f).SetEase(Ease.InQuad));
+
+        seq.Play();
     }
 
     private void OnCollisionEnter(Collision collision)
